@@ -1,3 +1,4 @@
+version: 2
 project_name: rttlog
 
 before:
@@ -8,20 +9,12 @@ builds:
   - id: rttlog
     main: ./cmd/rttlog
     binary: rttlog
-    env:
-      - CGO_ENABLED=0
-    goos:
-      - linux
-      - windows
-      - darwin
-    goarch:
-      - amd64
-      - arm64
+    env: [CGO_ENABLED=0]
+    goos: [linux, windows, darwin]
+    goarch: [amd64, arm64]
 
 archives:
   - id: default
-    format: tar.gz
-    builds: [rttlog]
     name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     files:
       - README.md
