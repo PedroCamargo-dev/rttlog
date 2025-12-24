@@ -21,8 +21,6 @@ func TestICMPProbeIntegration(t *testing.T) {
 
 	res := p.Probe("1.1.1.1", 1)
 	if res.Err != nil {
-		// go test executa um binário temporário sem setcap,
-		// então EPERM/EACCES é esperado se não rodar como root.
 		if errors.Is(res.Err, syscall.EPERM) || errors.Is(res.Err, syscall.EACCES) ||
 			strings.Contains(res.Err.Error(), "operation not permitted") {
 			t.Skip("ICMP raw socket requires privileges. Run with sudo, or build test binary and setcap it.")

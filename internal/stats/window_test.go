@@ -1,4 +1,3 @@
-// internal/stats/window_test.go
 package stats
 
 import (

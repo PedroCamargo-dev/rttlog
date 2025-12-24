@@ -74,7 +74,6 @@ func TestRunnerSummaryDeterministic(t *testing.T) {
 		t.Fatalf("start: %v", err)
 	}
 
-	// 10 ticks => 10 probes + 1 summary
 	for i := 0; i < 10; i++ {
 		fc.tickAll()
 	}
