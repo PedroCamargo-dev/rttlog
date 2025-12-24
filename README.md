@@ -1,120 +1,180 @@
-# rttlog
+<div align="center">
 
-A lightweight RTT (latency) monitor via ICMP (ping) with time-windowed summary.
-Focus: Simple CLI, low overhead, and useful metrics (avg/p95/min/max/loss) per target.
+# 🚀 rttlog
 
-Example (quiet mode + summary):
+### A lightweight RTT (latency) monitor via ICMP
+
+_Simple CLI • Low overhead • Useful metrics_
+
+[![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://golang.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey?style=for-the-badge)](https://github.com/PedroCamargo-dev/rttlog)
+
+</div>
+
+---
+
+## ✨ Features
+
+- **🌐 ICMP Echo** - IPv4 support (IPv6 when available)
+- **⚡ Parallel monitoring** - One worker per target
+- **📊 Time-windowed summaries** - Default 10s windows with comprehensive metrics
+- **🔇 Quiet mode** - Clean output with summaries only
+- **🚨 Spike detection** - Alerts for high latency
+- **🧪 Comprehensive testing** - Unit, race, and integration tests
+
+### 📈 Example Output
+
+```bash
 [rttlog] 2025/12/24 13:54:34 [10s] 1.1.1.1: sent=9 ok=9 loss=0.0% avg=8.5ms p95=9.2ms min=7.2ms max=9.2ms
+```
 
 ---
 
-## FEATURES
+## 📥 Installation
 
-- ICMP Echo (IPv4; IPv6 when supported).
-- Multiple targets in parallel (one worker per target).
-- Summary per window (default: 10s):
-  sent, ok, loss%, avg, p95, min, max
-- --quiet: prints only summary + errors (+ spikes).
-- --spike: alert when RTT >= threshold.
-- Tests: unit + race + optional integration (ICMP).
+### Option 1: Pre-built Binaries (Recommended)
 
----
+Download the latest release for your platform from the [Releases page](https://github.com/PedroCamargo-dev/rttlog/releases).
 
-## INSTALLATION
+### Option 2: Build from Source
 
-1. Via Releases (recommended)
-
-- Download the package for your system from the repository's Releases page and extract.
-
-2. Local build (dev)
-   go build -o rttlog ./cmd/rttlog
+```bash
+go build -o rttlog ./cmd/rttlog
+```
 
 ---
 
-## USAGE
+## 🚀 Usage
 
-Flags:
---targets string Targets separated by comma (IP or domain).
---interval duration Interval between probes per target. Ex: 1s, 250ms.
---timeout duration Probe timeout. Ex: 1s.
---summary duration Summary window. Ex: 10s, 30s.
---quiet Only summary + errors (+ spikes).
---spike duration Spike threshold. Ex: 80ms. 0 disables.
+### Command Line Flags
 
-Examples:
+| Flag         | Type     | Description                            | Example           |
+| ------------ | -------- | -------------------------------------- | ----------------- |
+| `--targets`  | string   | Comma-separated targets (IP or domain) | `1.1.1.1,8.8.8.8` |
+| `--interval` | duration | Interval between probes per target     | `1s`, `250ms`     |
+| `--timeout`  | duration | Probe timeout                          | `1s`              |
+| `--summary`  | duration | Summary window duration                | `10s`, `30s`      |
+| `--quiet`    | flag     | Only show summaries + errors + spikes  | -                 |
+| `--spike`    | duration | Spike threshold (0 disables)           | `80ms`            |
 
-Summary every 10s (quiet):
+### 💡 Quick Examples
+
+**Basic monitoring with 10s summaries:**
+
+```bash
 ./rttlog --targets 1.1.1.1,8.8.8.8 --interval 1s --timeout 1s --summary 10s --quiet
+```
 
-Summary every 30s + spike >= 80ms:
+**Advanced: 30s summaries + spike detection:**
+
+```bash
 ./rttlog --targets 1.1.1.1,8.8.8.8 --interval 1s --timeout 1s --summary 30s --quiet --spike 80ms
+```
 
 ---
 
-## ICMP PERMISSIONS (IMPORTANT)
+## 🔐 ICMP Permissions
 
-ICMP normally requires permission to open raw socket.
+> ⚠️ **Important:** ICMP requires raw socket permissions
 
-Linux (recommended: setcap)
+### 🐧 Linux (Recommended)
+
+```bash
 sudo setcap cap_net_raw+ep ./rttlog
-./rttlog --targets 1.1.1.1 --interval 1s --timeout 1s --summary 10s --quiet
+./rttlog --targets 1.1.1.1 --quiet
+```
 
-macOS
-sudo ./rttlog --targets 1.1.1.1 --interval 1s --timeout 1s --summary 10s --quiet
+### 🍎 macOS
 
-Windows
+```bash
+sudo ./rttlog --targets 1.1.1.1 --quiet
+```
 
-- Run terminal as Administrator:
-  rttlog.exe --targets 1.1.1.1,8.8.8.8 --interval 1s --timeout 1s --summary 10s --quiet
+### 🪟 Windows
+
+Run PowerShell/CMD as **Administrator**:
+
+```cmd
+rttlog.exe --targets 1.1.1.1,8.8.8.8 --quiet
+```
 
 ---
 
-## TESTS
+## 🧪 Testing
 
-Unit tests:
+### Unit Tests
+
+```bash
 go test ./... -count=1
+```
 
-Race detector:
+### Race Detection
+
+```bash
 go test ./... -race -count=1
+```
 
-ICMP integration (optional):
+### Integration Tests (Optional)
+
+```bash
+# Basic integration
 RTTLOG_INTEGRATION=1 go test -tags=integration ./... -count=1
 
-Linux (real integration, raw socket):
+# Linux with real raw sockets
 sudo -E env RTTLOG_INTEGRATION=1 go test -tags=integration ./... -count=1
+```
 
 ---
 
-## MULTI-PLATFORM BUILD (OUTPUT IN dist/)
+## 🏗️ Multi-Platform Build
 
+Create binaries for all platforms in `dist/` directory:
+
+```bash
 rm -rf dist && mkdir -p dist
 
+# Linux
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o dist/rttlog-linux-amd64 ./cmd/rttlog
 CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o dist/rttlog-linux-arm64 ./cmd/rttlog
+
+# Windows
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 go build -o dist/rttlog-windows-amd64.exe ./cmd/rttlog
+
+# macOS
 CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 go build -o dist/rttlog-darwin-amd64 ./cmd/rttlog
 CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 go build -o dist/rttlog-darwin-arm64 ./cmd/rttlog
+```
 
 ---
 
-## TROUBLESHOOTING
+## 🔧 Troubleshooting
 
-Error: "socket: operation not permitted"
+### ❌ "socket: operation not permitted"
 
-- Missing ICMP raw socket permission.
-  Linux: sudo setcap cap_net_raw+ep ./rttlog
-  macOS: run with sudo
-  Windows: run as Administrator
+**Cause:** Missing ICMP raw socket permissions
 
-High loss / timeouts
+**Solutions:**
 
-- Possible causes:
-  - ICMP blocked by firewall/router/ISP
-  - network instability
-  - target doesn't respond to ping
+- **Linux:** `sudo setcap cap_net_raw+ep ./rttlog`
+- **macOS:** Run with `sudo`
+- **Windows:** Run as Administrator
+
+### 📡 High packet loss / timeouts
+
+**Possible causes:**
+
+- ICMP blocked by firewall/router/ISP
+- Network instability
+- Target doesn't respond to ping
+- Incorrect target address
 
 ---
 
-## LICENSE
+## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+<div align="center">
+
+</div>
