@@ -110,6 +110,10 @@ func (r *defaultRunner) Start() error {
 			defer ticker.Stop()
 
 			seq := 1
+
+			r.results <- r.prober.Probe(t, seq)
+			seq++
+
 			for {
 				select {
 				case <-r.ctx.Done():
